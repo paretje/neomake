@@ -425,6 +425,8 @@ function! s:ProcessJobOutput(maker, lines) abort
 
         let &errorformat = olderrformat
     endif
+
+    doautocmd User NeomakeProcessed
 endfunction
 
 function! neomake#ProcessCurrentBuffer() abort
