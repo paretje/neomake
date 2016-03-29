@@ -239,6 +239,7 @@ endfunction
 
 function! s:Make(options) abort
     call neomake#signs#DefineSigns()
+    call neomake#highlights#DefineHighlights()
     call neomake#statusline#ResetCounts()
 
     let ft = get(a:options, 'ft', '')
@@ -316,6 +317,7 @@ endfunction
 function! s:AddExprCallback(maker) abort
     let file_mode = get(a:maker, 'file_mode')
     let place_signs = get(g:, 'neomake_place_signs', 1)
+    let highlight_columns = get(g:, 'neomake_highlight_columns', 1)
     let list = file_mode ? getloclist(a:maker.winnr) : getqflist()
     let list_modified = 0
     let index = file_mode ? s:loclist_nr[a:maker.winnr] : s:qflist_nr
@@ -369,6 +371,9 @@ function! s:AddExprCallback(maker) abort
 
         if place_signs
             call neomake#signs#RegisterSign(entry, maker_type)
+        endif
+        if highlight_columns
+            call neomake#highlights#AddHighlight(entry, maker_type)
         endif
     endwhile
 
@@ -436,6 +441,7 @@ function! neomake#ProcessCurrentBuffer() abort
         unlet s:job_output_by_buffer[buf]
     endif
     call neomake#signs#PlaceVisibleSigns()
+    call neomake#highlights#ShowHighlights(buf)
 endfunction
 
 function! s:RegisterJobOutput(jobinfo, maker, lines) abort
@@ -602,6 +608,7 @@ function! neomake#CleanOldProjectSignsAndErrors() abort
             unlet s:current_errors['project'][buf]
         endfor
         let s:need_errors_cleaning['project'] = 0
+        call neomake#highlights#ResetProject(a:bufnr)
         call neomake#utils#DebugMessage("All project-level errors cleaned.")
     endif
     call neomake#signs#CleanAllOldSigns('project')
@@ -613,6 +620,7 @@ function! neomake#CleanOldFileSignsAndErrors(bufnr) abort
             unlet s:current_errors['file'][a:bufnr]
         endif
         unlet s:need_errors_cleaning['file'][a:bufnr]
+        call neomake#highlights#ResetFile(a:bufnr)
         call neomake#utils#DebugMessage("File-level errors cleaned in buffer ".a:bufnr)
     endif
     call neomake#signs#CleanOldSigns(a:bufnr, 'file')
