@@ -1,10 +1,20 @@
 " vim: ts=4 sw=4 et
 
 let s:highlights = {'file': {}, 'project': {}}
-let s:highlight_types = {'E': 'NeomakeError', 'W': 'NeomakeWarning', 'I': 'NeomakeInformation', 'M': 'NeomakeMessage'}
+let s:highlight_types = {
+    \ 'E': 'NeomakeError',
+    \ 'W': 'NeomakeWarning',
+    \ 'I': 'NeomakeInformational',
+    \ 'M': 'NeomakeMessage'
+    \ }
 
 function! s:InitBufHighlights(type, buf) abort
-    let s:highlights[a:type][a:buf] = {'NeomakeError': [], 'NeomakeWarning': [], 'NeomakeInformation': [], 'NeomakeMessage': []}
+    let s:highlights[a:type][a:buf] = {
+        \ 'NeomakeError': [],
+        \ 'NeomakeWarning': [],
+        \ 'NeomakeInformational': [],
+        \ 'NeomakeMessage': []
+        \ }
 endfunction
 
 function! neomake#highlights#ResetFile(buf) abort
@@ -20,7 +30,8 @@ function! neomake#highlights#AddHighlight(entry, type) abort
         call s:InitBufHighlights(a:type, a:entry.bufnr)
     endif
     if a:entry.col
-        call add(s:highlights[a:type][a:entry.bufnr][get(s:highlight_types, toupper(a:entry.type), 'NeomakeError')], [a:entry.lnum, a:entry.col, 1])
+        let l:hi = get(s:highlight_types, toupper(a:entry.type), 'NeomakeError')
+        call add(s:highlights[a:type][a:entry.bufnr][l:hi], [a:entry.lnum, a:entry.col, 1])
     endif
 endfunction
 
@@ -37,10 +48,10 @@ let s:highlights_defined = 0
 function! neomake#highlights#DefineHighlights() abort
     if !s:highlights_defined
         let s:highlights_defined = 1
-        hi link NeomakeError Error
-        hi link NeomakeWarning TODO
-        hi link NeomakeInformation None
-        hi link NeomakeMessage None
+        for l:type in ['Error', 'Warning', 'Informational', 'Message']
+            exe 'hi link Neomake' . l:type . ' ' .
+                \ get(g:, 'neomake_' . tolower(l:type) . '_highlight', l:type)
+        endfor
     endif
 endfunction
 
