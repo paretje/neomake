@@ -19,10 +19,12 @@ endfunction
 
 function! neomake#highlights#ResetFile(buf) abort
     call s:InitBufHighlights('file', a:buf)
+    call neomake#highlights#ShowHighlights(a:buf)
 endfunction
 
 function! neomake#highlights#ResetProject(buf) abort
     call s:InitBufHighlights('project', a:buf)
+    call neomake#highlights#ShowHighlights(a:buf)
 endfunction
 
 function! neomake#highlights#AddHighlight(entry, type) abort
