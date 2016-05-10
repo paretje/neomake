@@ -459,7 +459,7 @@ function! neomake#ProcessCurrentWindow() abort
         call neomake#signs#PlaceVisibleSigns()
     endif
     call neomake#signs#PlaceVisibleSigns()
-    call neomake#highlights#ShowHighlights(buf)
+    call neomake#highlights#ShowHighlights(bufnr('%'))
 endfunction
 
 " Get tabnr and winnr for a given job ID.
